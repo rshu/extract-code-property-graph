@@ -19,3 +19,14 @@ A property graph is composed of the following building blocks:
 <p>
 In summary, Code Property Graphs are directed, edge-labeled, attributed multigraphs, and we insist that each node carries at least one attribute that indicates its type.
 </p>
+
+```shell
+# check JVM stacksize
+java -XX:+PrintFlagsFinal -version | grep -iE "HeapSize|PermSize|ThreadStackSize"
+```
+
+```shell
+# set JVM stack size to 1G to prevent java.lang.stackoverflow
+export _JAVA_OPTIONS=”-Xms512m -Xmx1024m”
+export _JAVA_OPTIONS="-Xss1g"
+```
