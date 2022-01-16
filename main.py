@@ -1,48 +1,16 @@
 from neo4j import __version__ as neo4j_version
-from neo4j import GraphDatabase
 from py2neo import Graph
 import matplotlib.pyplot as plt
-import py2neo
 import pandas as pd
 import re
-
-
-class Neo4jConnection:
-
-    def __init__(self, uri, user, pwd):
-        self.__uri = uri
-        self.__user = user
-        self.__pwd = pwd
-        self.__driver = None
-        try:
-            self.__driver = GraphDatabase.driver(self.__uri, auth=(self.__user, self.__pwd))
-        except Exception as e:
-            print("Failed to create the driver:", e)
-
-    def close(self):
-        if self.__driver is not None:
-            self.__driver.close()
-
-    def query(self, query, db=None):
-        assert self.__driver is not None, "Driver not initialized!"
-        session = None
-        response = None
-        try:
-            session = self.__driver.session(database=db) if db is not None else self.__driver.session()
-            response = list(session.run(query))
-        except Exception as e:
-            print("Query failed:", e)
-        finally:
-            if session is not None:
-                session.close()
-        return response
-
 
 if __name__ == "__main__":
     print(neo4j_version)
 
     # connect to graph database
     graphdb = Graph(scheme="bolt", host="localhost", port=7687, secure=False, auth=('neo4j', 'password'))
+
+    # graphdb.delete_all()
 
     # print summary statistics
     print(str(graphdb.run("""MATCH (n) RETURN count(n)""").evaluate()) + " nodes")
@@ -58,6 +26,7 @@ if __name__ == "__main__":
     # print(graphdb.run(
     #     """MATCH  ()-[r]-() RETURN type(r) AS RelationshipType, count(r) AS NumberOfRelationships""").to_table())
 
+    print(graphdb.run("""MATCH (n:FunctionDeclaration) RETURN (n)""").to_table())
     to_remove_lst = ["Node,", "Statement,", "Declaration,", "Expression,"]
 
     node_df = graphdb.run("""MATCH (n) RETURN labels(n) AS NodeType, count(n) AS NumberOfNodes""").to_data_frame()
@@ -71,7 +40,7 @@ if __name__ == "__main__":
     print(n_df)
 
     relationship_df = graphdb.run(
-        """MATCH  ()-[r]-() RETURN type(r) AS RelationshipType, count(r) AS NumberOfRelationships""").to_data_frame()
+        """MATCH ()-[r]-() RETURN type(r) AS RelationshipType, count(r) AS NumberOfRelationships""").to_data_frame()
     print(relationship_df)
     print(relationship_df.transpose().values)
     relationship_array = relationship_df.transpose().values
@@ -86,6 +55,8 @@ if __name__ == "__main__":
     print(df)
     df.to_csv('output.csv', index=False)
 
+    # # Summary stats
+    # print(graphdb.run("""MATCH ()-[p]-() RETURN type(p) as relationshipType, count(p) AS total""").to_table())
 
     # driver = GraphDatabase.driver(uri="bolt://localhost:7687", auth=("neo4j", "password"),
     #                               max_connection_lifetime=1000)

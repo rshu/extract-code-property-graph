@@ -30,3 +30,7 @@ java -XX:+PrintFlagsFinal -version | grep -iE "HeapSize|PermSize|ThreadStackSize
 export _JAVA_OPTIONS=”-Xms512m -Xmx1024m”
 export _JAVA_OPTIONS="-Xss1g"
 ```
+
+<p>
+<strong>Graph embedding</strong> is an approach that is used to transform nodes, edges, and their features into vector space (a lower dimension) whilst maximally preserving properties like graph structure and information
+</p>
